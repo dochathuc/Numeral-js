@@ -378,8 +378,8 @@
          * problems for accounting- and finance-related software.
          */
         toFixed: function(value, maxDecimals, roundingFunction, optionals) {
-            var splitValue = value.toString().split('.'),
-				splitE = value.toString().split('e-'),
+            var splitE = value.toString().split('e-');
+            var splitValue = splitE[0].split('.'),
                 minDecimals = maxDecimals - (optionals || 0),
                 boundedPrecision,
                 optionalsRegExp,
@@ -387,27 +387,27 @@
                 output;
 
             // Use the smallest precision value possible to avoid errors from floating point representation
-			if (splitE.length === 1) {
-				if (splitValue.length === 2) {
-					boundedPrecision = Math.min(Math.max(splitValue[1].length, minDecimals), maxDecimals);
-				} else {
-					boundedPrecision = minDecimals;
-				}
-			} else if (splitE.length === 2) {
-				var exponential = parseInt(splitE[1]);
-				if (splitValue.length === 2) {
-					boundedPrecision = Math.min(Math.max(splitValue[1].length + exponential, minDecimals), maxDecimals);
-				} else {
-					boundedPrecision = Math.min(Math.max(exponential, minDecimals), maxDecimals);
-				}
-			} else {
-				boundedPrecision = minDecimals;
-			}
+            if (splitE.length === 1) {
+                if (splitValue.length === 2) {
+                    boundedPrecision = Math.min(Math.max(splitValue[1].length, minDecimals), maxDecimals);
+                } else {
+                    boundedPrecision = minDecimals;
+                }
+            } else if (splitE.length === 2) {
+                var exponential = parseInt(splitE[1]);
+                if (splitValue.length === 2) {
+                    boundedPrecision = Math.min(Math.max(splitValue[1].length + exponential, minDecimals), maxDecimals);
+                } else {
+                    boundedPrecision = Math.min(Math.max(exponential, minDecimals), maxDecimals);
+                }
+            } else {
+                boundedPrecision = minDecimals;
+            }
 
             power = Math.pow(10, boundedPrecision);
 
             // Multiply up by precision, round accurately, then divide and use native toFixed():
-			var valueToRound = value.toString().indexOf('e') >= 0 ? (value  *  power) : (value + 'e+' + boundedPrecision);
+            var valueToRound = value.toString().indexOf('e') >= 0 ? (value  *  power) : (value + 'e+' + boundedPrecision);
             output = (roundingFunction(valueToRound) / power).toFixed(boundedPrecision);
 
             if (optionals > maxDecimals - boundedPrecision) {
